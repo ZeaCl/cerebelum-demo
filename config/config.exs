@@ -13,6 +13,15 @@ config :cerebelum, Cerebelum.Repo,
 config :cerebelum_demo,
   ecto_repos: [Cerebelum.Repo]
 
+# Phoenix endpoint (needed because Endpoint is in :cerebelum app)
+config :cerebelum, Cerebelum.API.Endpoint,
+  url: [host: "localhost"],
+  adapter: Bandit.PhoenixAdapter,
+  render_errors: [formats: [json: Cerebelum.API.ErrorJSON]],
+  pubsub_server: Cerebelum.API.PubSub
+
+config :phoenix, :json_library, Jason
+
 # ── cerebelum features ──
 config :cerebelum,
   # HTTP REST API
