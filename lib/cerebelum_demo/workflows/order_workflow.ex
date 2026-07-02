@@ -47,7 +47,7 @@ defmodule CerebelumDemo.Workflows.OrderWorkflow do
     {:ok, %{order: order, amount: total, status: :paid}}
   end
 
-  def ship_order(_context, {:ok, _prev1}, {:ok, _prev2}, {:ok, payment}) do
+  def ship_order(_context, {:ok, _p0}, {:ok, _p1}, {:ok, _payment}) do
     {:ok, %{tracking: "TRK-#{:rand.uniform(9999)}", carrier: "FedEx"}}
   end
 

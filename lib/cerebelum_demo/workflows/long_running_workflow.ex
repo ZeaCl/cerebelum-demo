@@ -30,24 +30,24 @@ defmodule CerebelumDemo.Workflows.LongRunningWorkflow do
     {:ok, %{email_sent: true, to: user[:email], at: DateTime.utc_now()}}
   end
 
-  def wait_3_days(_context, _result) do
+  def wait_3_days(_context, {:ok, _prev}) do
     IO.puts("⏳ Sleeping for 3 days... (demo: 3 seconds)")
     Process.sleep(3000)
     {:ok, :awake}
   end
 
-  def send_reminder(_context, _result) do
+  def send_reminder(_context, {:ok, _prev0}, {:ok, _prev1}) do
     IO.puts("📧 Sending reminder email...")
     {:ok, %{reminder_sent: true, at: DateTime.utc_now()}}
   end
 
-  def wait_1_day(_context, _result) do
+  def wait_1_day(_context, {:ok, _p0}, {:ok, _p1}, {:ok, _p2}) do
     IO.puts("⏳ Sleeping for 1 day... (demo: 1 second)")
     Process.sleep(1000)
     {:ok, :awake}
   end
 
-  def check_completion(_context, _result) do
+  def check_completion(_context, {:ok, _p0}, {:ok, _p1}, {:ok, _p2}, {:ok, _p3}) do
     completed = :rand.uniform() > 0.3
     IO.puts("🔍 Checking completion: #{completed}")
     {:ok, %{completed: completed}}
