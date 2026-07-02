@@ -29,7 +29,7 @@ config :cerebelum,
   http_port: 4001,
 
   # gRPC for Python workers
-  enable_grpc_server: false,
+  enable_grpc_server: true,
   grpc_port: 50051,
 
   # Workflow resurrection

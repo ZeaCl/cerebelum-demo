@@ -1,8 +1,45 @@
 # 🧠 Cerebelum Demo
 
-> **Workflow orchestration en 5 minutos.**
+> **Workflow orchestration — Elixir engine + Python SDK. Sin recompilar.**
 
-## Requisitos
+## Elige tu modo
+
+## Elige tu modo
+
+### Requisitos
+
+- Elixir 1.18+
+- PostgreSQL corriendo
+- Python 3.10+ (para Python SDK)
+
+### 🐍 Python SDK (recomendado)
+
+Workflows en Python, sin recompilar, sin reiniciar.
+
+```bash
+cd examples/python
+python3 -m venv venv && source venv/bin/activate
+pip install cerebelum-sdk
+
+# Modo local (sin engine)
+python 01_local_workflow.py
+
+# Modo distribuido (con engine corriendo en otra terminal)
+python 01_local_workflow.py --distributed
+```
+
+➡️ [Guía completa](examples/python/README.md)
+
+### 💧 Elixir nativo
+
+Workflows compilados con máxima performance.
+
+```bash
+iex -S mix
+# En IEx:
+alias CerebelumDemo.Workflows.OrderWorkflow
+{:ok, exec} = Cerebelum.execute_workflow(OrderWorkflow, %{order: %{id: "ORD-123", items: [%{name: "Widget", price: 25}]}})
+```
 
 - Elixir 1.18+
 - PostgreSQL corriendo
