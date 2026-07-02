@@ -3,19 +3,20 @@ Demo: E-commerce workflow in Python — NO recompilation needed.
 
 Usage:
   # Local mode (no engine required):
-  python examples/python/01_local_workflow.py
+  python 01_local_workflow.py
 
   # Distributed mode (requires iex -S mix running in another terminal):
-  python examples/python/01_local_workflow.py --distributed
+  python 01_local_workflow.py --distributed
 """
 
 import asyncio
 import sys
 from cerebelum import step, workflow, Context
-from cerebelum import LocalExecutor, DistributedExecutor
+from cerebelum import DistributedExecutor
 
 
 # ── Step definitions ──────────────────────────────────────
+# Parameters are resolved by NAME (must match previous step names)
 
 @step
 async def validate_order(context: Context, inputs: dict):
@@ -43,14 +44,14 @@ async def process_payment(context: Context, validate_order: dict, check_inventor
 
 
 @step
-async def ship_order(context: Context, _v, _c, process_payment: dict):
+async def ship_order(context: Context, process_payment: dict):
     import random
     payment = process_payment
     return {"ok": {"tracking": f"TRK-{random.randint(1000, 9999)}", "carrier": "FedEx"}}
 
 
 @step
-async def notify_customer(context: Context, _v, _c, _p, ship_order: dict):
+async def notify_customer(context: Context, ship_order: dict):
     shipment = ship_order
     print(f"📦 Order shipped! Tracking: {shipment['tracking']}")
     return {"ok": "notified"}
@@ -92,8 +93,9 @@ async def main():
         print("💻 Local mode (pure Python, no engine)")
         result = await order_workflow.execute(inputs)
 
-    print(f"Status: {result.state}")
-    print(f"Results: {result.results}")
+    print(f"Status: {result.status}")
+    if hasattr(result, 'final_result'):
+        print(f"Final: {result.final_result}")
 
 
 if __name__ == "__main__":
