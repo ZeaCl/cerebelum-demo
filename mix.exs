@@ -15,7 +15,7 @@ defmodule CerebelumDemo.MixProject do
   def application do
     [
       mod: {CerebelumDemo.Application, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :postgrex, :ecto_sql]
     ]
   end
 
