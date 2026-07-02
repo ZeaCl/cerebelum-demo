@@ -2,9 +2,8 @@ defmodule CerebelumDemo.Workflows.OrderWorkflow do
   @moduledoc """
   Demo: E-commerce order processing.
 
-  Shows timeline, diverge (error handling), and branch (conditional routing).
+  Steps receive previous results as {:ok, value} or {:error, reason} tuples.
   """
-
   use Cerebelum.Workflow
 
   workflow do
@@ -16,46 +15,43 @@ defmodule CerebelumDemo.Workflows.OrderWorkflow do
       |> notify_customer()
     end
 
-    # Handle validation errors
     diverge from: validate_order() do
       {:error, :invalid_data} -> :failed
       {:error, :timeout} -> back_to(:validate_order)
     end
 
-    # Handle inventory issues
     diverge from: check_inventory() do
       {:error, :out_of_stock} -> :failed
     end
 
-    # Business logic routing
     branch after: process_payment(), on: result do
-      result[:amount] > 1000 -> :high_value_path
-      true -> :standard_path
+      result[:amount] > 1000 -> skip_to(:notify_customer)
+      true -> :continue
     end
   end
 
-  # ── Step implementations ──
+  # ── Steps ──
 
   def validate_order(context) do
     order = context.inputs[:order]
     if order && order[:id], do: {:ok, order}, else: {:error, :invalid_data}
   end
 
-  def check_inventory(_context, order) do
-    in_stock = Map.get(order, :items, []) |> length() > 0
-    if in_stock, do: {:ok, order}, else: {:error, :out_of_stock}
+  def check_inventory(_context, {:ok, order}) do
+    items = order[:items] || []
+    if length(items) > 0, do: {:ok, order}, else: {:error, :out_of_stock}
   end
 
-  def process_payment(_context, order) do
-    total = order[:items] |> Enum.reduce(0, & &1[:price] + &2)
+  def process_payment(_context, {:ok, _prev}, {:ok, order}) do
+    total = (order[:items] || []) |> Enum.reduce(0, &(&1[:price] || 0) + &2)
     {:ok, %{order: order, amount: total, status: :paid}}
   end
 
-  def ship_order(_context, payment) do
+  def ship_order(_context, {:ok, _prev1}, {:ok, _prev2}, {:ok, payment}) do
     {:ok, %{tracking: "TRK-#{:rand.uniform(9999)}", carrier: "FedEx"}}
   end
 
-  def notify_customer(_context, shipment) do
+  def notify_customer(_context, {:ok, _prev1}, {:ok, _prev2}, {:ok, _prev3}, {:ok, shipment}) do
     IO.puts("📦 Order shipped! Tracking: #{shipment[:tracking]}")
     {:ok, :notified}
   end

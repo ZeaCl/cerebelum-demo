@@ -10,6 +10,9 @@ config :cerebelum, Cerebelum.Repo,
   hostname: System.get_env("DB_HOST", "localhost"),
   pool_size: 10
 
+config :cerebelum_demo,
+  ecto_repos: [Cerebelum.Repo]
+
 # ── cerebelum features ──
 config :cerebelum,
   # HTTP REST API

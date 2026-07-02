@@ -4,18 +4,10 @@ defmodule CerebelumDemo.Application do
 
   @impl true
   def start(_type, _args) do
+    # cerebelum already starts: Repo, EventStore, Engine, Registry, etc.
+    # We only add HTTP API + PubSub
+
     children = [
-      Cerebelum.Repo,
-      Cerebelum.EventStore,
-      Cerebelum.Execution.Registry,
-      Cerebelum.Execution.Supervisor,
-      Cerebelum.Infrastructure.WorkerRegistry,
-      Cerebelum.Infrastructure.TaskRouter,
-      Cerebelum.Infrastructure.BlueprintRegistry,
-      Cerebelum.Infrastructure.ExecutionStateManager,
-      Cerebelum.Infrastructure.DLQ,
-      Cerebelum.Execution.Resurrector,
-      Cerebelum.Infrastructure.WorkflowScheduler,
       {Phoenix.PubSub, name: Cerebelum.API.PubSub},
       Cerebelum.API.Endpoint
     ]
